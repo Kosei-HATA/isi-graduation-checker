@@ -1,0 +1,13 @@
+{
+  "name": "isi-graduation-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "共創学部 卒業要件チェッカー（Campusmate 成績照会HTMLを解析して卒業要件を判定）",
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

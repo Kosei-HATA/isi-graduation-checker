@@ -1,0 +1,6 @@
+.DS_Store
+node_modules/
+*.log
+
+# 個人成績データ（ローカルでの検証用サンプル）
+Campusmate.html

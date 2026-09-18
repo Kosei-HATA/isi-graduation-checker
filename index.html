@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2023年度　共創学部 卒業要件チェッカー</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>2023年度　共創学部 卒業要件チェッカー</h1>
+</header>
+
+<main>
+  <section class="card" id="howto">
+    <h2>使い方</h2>
+    <ol class="steps">
+      <li><strong>成績照会</strong>（Campusmate）ページを開く</li>
+      <li><strong>Ctrl+S</strong>（Mac は <strong>Cmd+S</strong>）で「Webページ、完全」として保存</li>
+      <li>保存した <strong>.html ファイル</strong>を下の欄にドラッグ&amp;ドロップ / ファイル選択、または内容をコピー&amp;ペースト</li>
+    </ol>
+    <figure>
+      <img src="assets/howto-save.png" alt="成績照会ページで Ctrl+S / Cmd+S を押して保存する手順">
+      <figcaption>成績照会ページで Ctrl+S / Cmd+S を押して保存します（「Webページ、完全」を選択）</figcaption>
+    </figure>
+  </section>
+
+  <section class="card" id="upload">
+    <h2>1. 成績HTMLを読み込む</h2>
+    <div id="dropzone" tabindex="0">
+      <p class="dz-main">ここに .html ファイルをドラッグ&amp;ドロップ</p>
+      <p class="dz-sub">または <button type="button" id="pickBtn">ファイルを選択</button></p>
+      <input type="file" id="fileInput" accept=".html,.htm,.txt" hidden>
+    </div>
+    <textarea id="pasteArea" rows="5" placeholder="または、保存したHTMLの内容（テキスト）をここに貼り付けて「チェックする」を押してください"></textarea>
+    <div class="row">
+      <button type="button" id="runBtn" class="primary">チェックする</button>
+      <button type="button" id="clearBtn">クリア</button>
+    </div>
+    <p id="parseError" class="error" hidden></p>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <h2>2. 判定結果</h2>
+    <div id="summary"></div>
+    <div id="missing"></div>
+    <div id="progress"></div>
+    <div id="others"></div>
+    <div id="courses"></div>
+    <div id="excluded"></div>
+  </section>
+</main>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
