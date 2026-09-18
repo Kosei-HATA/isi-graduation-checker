@@ -102,7 +102,7 @@ function renderSummary(r) {
       <div class="stat"><div class="num">${r.missing.length} 項目</div><div class="lbl">要件別の不足項目（指定科目は優先して履修）</div></div>
       <div class="stat"><div class="num">${fmt(r.totalShort)} 単位</div><div class="lbl">要件別の不足単位の合計</div></div>
       <div class="stat"><div class="num">${escapeHtml(lang2Html)}</div><div class="lbl">第2外国語（データから自動推定）</div></div>
-      <div class="stat"><div class="num">${gpa.gpa.toFixed(2)}</div><div class="lbl">計算GPA（S4/A3/B2/C1/F0・対象${fmt(gpa.credits)}単位。R/W除外）</div></div>
+      <div class="stat"><div class="num">${gpa.gpa.toFixed(2)}</div><div class="lbl">計算GPA（S4/A3/B2/C1/F0・R/W除外）</div><div class="lbl">対象単位数 ${fmt(gpa.credits)} / GPT ${fmt(gpa.points)}</div></div>
     </div>`;
 }
 

@@ -50,6 +50,7 @@ test("app.js: DOMスタブ上で起動し、実HTMLのチェックが一連の�
   assert.match(els.get("summary").innerHTML, /中国語（6単位）/);
   assert.match(els.get("summary").innerHTML, /計算GPA/);
   assert.match(els.get("summary").innerHTML, /3\.67/);
+  assert.match(els.get("summary").innerHTML, /対象単位数 111\.5 \/ GPT 409/);
   assert.match(els.get("missing").innerHTML, /ディグリープロジェクト/);
   assert.match(els.get("missing").innerHTML, /<th class="num">不足<\/th>/);
   assert.match(els.get("missing").innerHTML, /新規に取らなければいけない単位数（要件別の不足単位の合計）/);
