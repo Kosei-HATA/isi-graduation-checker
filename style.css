@@ -115,6 +115,17 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .stat .num { font-size: 1.3rem; font-weight: 700; }
 .stat .lbl { font-size: .82rem; color: var(--muted); }
 
+.total-need {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 10px 0 4px;
+  padding: 10px 14px;
+  border: 1px solid #f0c4c3;
+  background: var(--ng-bg);
+  border-radius: 8px;
+}
+.total-need b { color: var(--ng); font-size: 1.4rem; }
+
 table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-top: 10px; }
 th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
 th { background: #eef2f6; position: sticky; top: 0; }
