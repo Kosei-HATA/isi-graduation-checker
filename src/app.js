@@ -122,6 +122,12 @@ function renderMissing(r) {
     <table>
       <thead><tr><th>区分</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
       <tbody>${rows}</tbody>
+      <tfoot><tr>
+        <td>取らなければいけない単位数（要件別の不足単位の合計）</td>
+        <td class="num">—</td>
+        <td class="num">—</td>
+        <td class="num" style="color:var(--ng);font-weight:700">${fmt(r.totalShort)}</td>
+      </tr></tfoot>
     </table>`;
 }
 
