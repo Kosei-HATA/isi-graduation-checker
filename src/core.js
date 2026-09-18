@@ -1,6 +1,22 @@
 export const PASS_GRADES = new Set(["S", "A", "B", "C", "R", "P"]);
 export const EXCLUDED_GRADES = new Set(["F", "W", "D", "IP"]);
 
+export const GRADE_POINTS = { S: 4, A: 3, B: 2, C: 1, F: 0 };
+
+export function calcGPA(courses) {
+  let credits = 0;
+  let points = 0;
+  const byGrade = {};
+  for (const c of courses) {
+    const p = GRADE_POINTS[c.grade];
+    if (p === undefined) continue;
+    credits += c.credits;
+    points += p * c.credits;
+    byGrade[c.grade] = (byGrade[c.grade] || 0) + c.credits;
+  }
+  return { gpa: credits ? points / credits : 0, credits, points, byGrade };
+}
+
 export const DEFAULT_CONFIG = {
   lang1Prefixes: ["KED-LCB11", "KED-LCB21"],
   extraApproachHS: [],

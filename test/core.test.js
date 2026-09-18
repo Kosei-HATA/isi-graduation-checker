@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { parseGradeHTML } from "../src/parser.js";
-import { evaluate, classifyCourse, DEFAULT_CONFIG } from "../src/core.js";
+import { evaluate, classifyCourse, DEFAULT_CONFIG, calcGPA } from "../src/core.js";
 
 let REAL_HTML = null;
 try {
@@ -529,6 +529,35 @@ test("評価: レクチャーシリーズとアプローチだけで構想科目
   assert.equal(r.missing.find(m => m.label === "構想科目（合計）"), undefined);
   assert.equal(r.buckets.approachHS, 26);
   assert.equal(r.specOthers.breakdown.o, 0);
+});
+
+test("GPA: S=4/A=3/B=2/C=1/F=0 で加重平均、R/Wは分母・分子とも除外", () => {
+  const courses = [
+    C(0, "S科目", 2, "KED-KES1111", "", "S"),
+    C(1, "A科目", 1, "KED-KES1111", "", "A"),
+    C(2, "B科目", 1, "KED-KES1111", "", "B"),
+    C(3, "C科目", 1, "KED-KES1111", "", "C"),
+    C(4, "F科目", 1, "KED-KES1111", "", "F"),
+    C(5, "R科目", 1, "KED-KES1111", "", "R"),
+    C(6, "W科目", 1, "KED-KES1111", "", "W"),
+  ];
+  const r = calcGPA(courses);
+  assert.equal(r.credits, 6);
+  assert.equal(r.points, 4 * 2 + 3 + 2 + 1 + 0);
+  assert.equal(r.gpa, 14 / 6);
+  assert.deepEqual(r.byGrade, { S: 2, A: 1, B: 1, C: 1, F: 1 });
+});
+
+test("GPA: 対象科目が無ければ0", () => {
+  assert.equal(calcGPA([C(0, "R科目", 1, "KED-KES1111", "", "R")]).gpa, 0);
+});
+
+test("統合: 実HTMLのGPAが期待値と一致する（3.668・対象111.5単位）", t => {
+  if (!REAL_HTML) return t.skip();
+  const { courses } = parseGradeHTML(REAL_HTML);
+  const r = calcGPA(courses);
+  assert.ok(Math.abs(r.gpa - 3.668) < 0.001, r.gpa);
+  assert.equal(r.credits, 111.5);
 });
 
 test("分類: 第1外国語不足は第2外国語で穴埋めできない", () => {
