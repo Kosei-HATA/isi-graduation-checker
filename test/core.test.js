@@ -18,7 +18,8 @@ const KIKAN_MIN = [
   C(1, "課題協学科目", 2.5, "KED-ICL1131", "課題協学科目"),
   ...Array.from({ length: 4 }, (_, i) => C(2 + i, `文系${i}`, 2, `KED-HSS11${i + 1}`, "文系ディシプリン科目")),
   C(6, "情報科学", 2, "KED-SIS1112", "理系ディシプリン科目"),
-  ...Array.from({ length: 6 }, (_, i) => C(7 + i, `理科${i}`, 1, `KED-SBI10${i + 1}`, "理系ディシプリン科目")),
+  C(7, "プログラミング演習", 1, "KED-SIS1121", "理系ディシプリン科目"),
+  ...Array.from({ length: 5 }, (_, i) => C(8 + i, `理科${i}`, 1, `KED-SBI10${i + 1}`, "理系ディシプリン科目")),
   ...Array.from({ length: 10 }, (_, i) => C(13 + i, `Intensive English: Course ${i}`, 1, `KED-LCB118${i + 1}`, "言語文化基礎科目")),
   ...Array.from({ length: 2 }, (_, i) => C(23 + i, "学術英語・テーマベース", 1, "KED-LCB2113", "言語文化基礎科目")),
   ...Array.from({ length: 4 }, (_, i) => C(25 + i, `中国語${i}`, 1, `KED-LCB141${i + 3}`, "言語文化基礎科目")),
@@ -29,7 +30,13 @@ const KIKAN_MIN = [
 ];
 
 const SPECIALIZED_MIN = [
-  ...Array.from({ length: 7 }, (_, i) => C(40 + i, `共創基礎${i}`, 1, `ISI-ISI130${i + 1}`, "（共創）共創基礎科目")),
+  C(40, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+  C(41, "課題とイノベーション", 1, "ISI-ISI1302", "（共創）共創基礎科目"),
+  C(42, "共創のための数学", 1, "ISI-ISI1303", "（共創）共創基礎科目"),
+  C(43, "システム科学基礎", 1, "ISI-ISI1304", "（共創）共創基礎科目"),
+  C(44, "データの収集・分析", 1, "ISI-ISI1305", "（共創）共創基礎科目"),
+  C(45, "世界の様々な哲学", 1, "ISI-ISI1306", "（共創）共創基礎科目"),
+  C(46, "世界を理解するための歴史的視座", 1, "ISI-ISI1307", "（共創）共創基礎科目"),
   C(47, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）レクチャーシリーズ"),
   C(48, "〔人社〕科目１", 1, "ISI-ISI2103", "（共創）アプローチ科目"),
   C(49, "〔人社〕科目２", 1, "ISI-ISI2110", "（共創）アプローチ科目"),
@@ -42,11 +49,11 @@ const SPECIALIZED_MIN = [
   ...Array.from({ length: 6 }, (_, i) => C(75 + i, "共創プロジェクト", 1, "ISI-ISI3901", "（共創）共創プロジェクト")),
   C(81, "異文化対応 1", 1, "ISI-ISI2604", "（共創）異文化対応"),
   C(82, "異文化対応 2", 1, "ISI-ISI2605", "（共創）異文化対応"),
-  C(83, "ディグリープロジェクト１", 2, "ISI-ISI4601", "（共創）ディグリープロジェクト"),
-  C(84, "ディグリープロジェクト２", 5, "ISI-ISI4602", "（共創）ディグリープロジェクト"),
-  C(85, "ディグリープロジェクト３", 2, "ISI-ISI4603", "（共創）ディグリープロジェクト"),
-  C(86, "共創発展演習１", 2, "ISI-ISI4901", "（共創）共創発展演習"),
-  C(87, "共創発展演習２", 2, "ISI-ISI4902", "（共創）共創発展演習"),
+  C(83, "ディグリープロジェクト1", 2, "ISI-ISI4601", "（共創）ディグリープロジェクト"),
+  C(84, "ディグリープロジェクト2", 5, "ISI-ISI4602", "（共創）ディグリープロジェクト"),
+  C(85, "ディグリープロジェクト3", 2, "ISI-ISI4603", "（共創）ディグリープロジェクト"),
+  C(86, "共創発展演習1", 2, "ISI-ISI4901", "（共創）共創発展演習"),
+  C(87, "共創発展演習2", 2, "ISI-ISI4902", "（共創）共創発展演習"),
   ...Array.from({ length: 6 }, (_, i) => C(88 + i, `課題研究${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目")),
 ];
 
@@ -280,7 +287,10 @@ test("評価: 他学部科目は上限10単位まで・超過分はcapped表示"
 });
 
 test("評価: 協働科目は超過2単位までその他（か）に算入", () => {
-  const collabs = Array.from({ length: 12 }, (_, i) => C(40 + i, "共創プロジェクト", 1, "ISI-ISI3901", "（共創）共創プロジェクト"));
+  const collabs = [
+    C(40, "共創基礎プロジェクト", 2, "ISI-ISI2903", "（共創）共創基礎プロジェクト"),
+    ...Array.from({ length: 10 }, (_, i) => C(41 + i, "共創プロジェクト", 1, "ISI-ISI3901", "（共創）共創プロジェクト")),
+  ];
   const r = evaluate(collabs);
   assert.equal(r.missing.find(m => m.label === "協働科目"), undefined);
   assert.equal(r.specOthers.breakdown.ka, 2);
@@ -422,13 +432,59 @@ test("分類: 言語文化科目で非LCBコードでも科目名で判定され
 
 test("評価: その他（く）は共創科目（DP+演習+課題）の19単位超過で計算される", () => {
   const courses = [
-    ...Array.from({ length: 9 }, (_, i) => C(i, `DP${i}`, 1, `ISI-ISI46${String(10 + i).padStart(2, "0")}`, "（共創）ディグリープロジェクト")),
-    ...Array.from({ length: 4 }, (_, i) => C(9 + i, `演習${i}`, 1, `ISI-ISI49${String(10 + i).padStart(2, "0")}`, "（共創）共創発展演習")),
-    ...Array.from({ length: 9 }, (_, i) => C(13 + i, `課題${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目")),
+    C(0, "ディグリープロジェクト1", 2, "ISI-ISI4601", "（共創）ディグリープロジェクト"),
+    C(1, "ディグリープロジェクト2", 5, "ISI-ISI4602", "（共創）ディグリープロジェクト"),
+    C(2, "ディグリープロジェクト3", 2, "ISI-ISI4603", "（共創）ディグリープロジェクト"),
+    C(3, "共創発展演習1", 2, "ISI-ISI4901", "（共創）共創発展演習"),
+    C(4, "共創発展演習2", 2, "ISI-ISI4902", "（共創）共創発展演習"),
+    ...Array.from({ length: 9 }, (_, i) => C(5 + i, `課題研究${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目")),
   ];
   const r = evaluate(courses);
   assert.equal(r.missing.find(m => m.label === "ディグリープロジェクト"), undefined);
   assert.equal(r.specOthers.breakdown.ku, 3);
+});
+
+test("評価: 科目名指定の必修が未修得なら単位数が足りても不足と判定（DP1だけ9単位）", () => {
+  const courses = [
+    ...Array.from({ length: 9 }, (_, i) => C(i, "ディグリープロジェクト1", 1, `ISI-ISI46${i + 1}`, "（共創）ディグリープロジェクト")),
+  ];
+  const r = evaluate(courses);
+  const dp = r.missing.find(m => m.label === "ディグリープロジェクト");
+  assert.ok(dp);
+  assert.equal(dp.earned, 9);
+  assert.equal(dp.short, 7);
+  assert.deepEqual(dp.named.filter(x => x.short > 0).map(x => [x.label, x.short]), [
+    ["ディグリープロジェクト2", 5],
+    ["ディグリープロジェクト3", 2],
+  ]);
+});
+
+test("評価: 理系8単位でも情報科学・プログラミング演習が無ければ不足", () => {
+  const science = Array.from({ length: 8 }, (_, i) => C(i, `理科科目${i}`, 1, `KED-SCH10${i + 1}`, "理系ディシプリン科目"));
+  const r = evaluate(science);
+  const ri = r.missing.find(m => m.label === "理系ディシプリン科目");
+  assert.ok(ri);
+  assert.equal(ri.earned, 8);
+  assert.equal(ri.short, 3);
+  assert.deepEqual(ri.named.filter(x => x.short > 0).map(x => x.label), ["情報科学", "プログラミング演習"]);
+});
+
+test("評価: 共創基礎科目は7科目すべて科目名指定でチェックされる", () => {
+  const courses = [
+    C(0, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(1, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(2, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(3, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(4, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(5, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+    C(6, "学術研究基礎", 1, "ISI-ISI1301", "（共創）共創基礎科目"),
+  ];
+  const r = evaluate(courses);
+  const f = r.missing.find(m => m.label === "共創基礎科目");
+  assert.ok(f);
+  assert.equal(f.earned, 7);
+  assert.equal(f.short, 6);
+  assert.equal(f.named.filter(x => x.short > 0).length, 6);
 });
 
 test("評価: 共創科目（その他）が専攻その他に算入される", () => {
@@ -443,11 +499,14 @@ test("評価: 共創科目（その他）が専攻その他に算入される", 
   assert.equal(r.missing.find(m => m.label === "構想科目（合計）").short, 26);
 });
 
-test("評価: 構想科目が構想その他だけで満たせる", () => {
+test("評価: 構想科目はレクチャーシリーズが必須（構想その他だけでは不足）", () => {
   const courses = Array.from({ length: 28 }, (_, i) => C(i, `共創基礎演習${i}`, 1, "KED-XXX9999", "（共創）構想科目"));
   const r = evaluate(courses);
-  assert.equal(r.missing.find(m => m.label === "構想科目（合計）"), undefined);
-  assert.equal(r.buckets.framingOther, 28);
+  const f = r.missing.find(m => m.label === "構想科目（合計）");
+  assert.ok(f);
+  assert.equal(f.earned, 28);
+  assert.equal(f.short, 2);
+  assert.deepEqual(f.named.filter(x => x.short > 0).map(x => x.label), ["レクチャーシリーズ"]);
 });
 
 test("評価: レクチャーシリーズとアプローチだけで構想科目28を満たす", () => {

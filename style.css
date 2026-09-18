@@ -135,6 +135,17 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .progress-fill { height: 100%; background: var(--ok); border-radius: 999px; }
 .progress-row.ng .progress-fill { background: var(--ng); }
 .progress-row.ng .val { color: var(--ng); font-weight: 700; }
+.progress-sub {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) 1fr 1fr;
+  gap: 10px;
+  padding-left: 20px;
+  font-size: .82rem;
+  color: var(--ng);
+}
+.progress-sub .val { text-align: right; }
+
+.sub { font-size: .78rem; color: var(--muted); font-weight: normal; }
 
 .others-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
 .others-box { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }

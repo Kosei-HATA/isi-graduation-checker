@@ -8,28 +8,94 @@ export const DEFAULT_CONFIG = {
   extraApproachID: ["ISI-ISI3504", "ISI-ISI3330"],
 };
 
+const eq = x => n => n === x;
+const re = r => n => r.test(n);
+
 export const REQUIREMENTS_2023 = {
   kikan: [
-    { label: "基幹教育セミナー", buckets: ["seminar"], required: 1 },
-    { label: "課題協学科目", buckets: ["icl"], required: 2.5 },
+    {
+      label: "基幹教育セミナー", buckets: ["seminar"], required: 1,
+      named: [{ label: "基幹教育セミナー", required: 1, test: eq("基幹教育セミナー") }],
+    },
+    {
+      label: "課題協学科目", buckets: ["icl"], required: 2.5,
+      named: [{ label: "課題協学科目", required: 2.5, test: eq("課題協学科目") }],
+    },
     { label: "文系ディシプリン科目", buckets: ["humanities"], required: 8 },
-    { label: "理系ディシプリン科目", buckets: ["science"], required: 8 },
-    { label: "第1外国語+学術英語", buckets: ["lang1"], required: 12 },
+    {
+      label: "理系ディシプリン科目", buckets: ["science"], required: 8,
+      named: [
+        { label: "情報科学", required: 2, test: eq("情報科学") },
+        { label: "プログラミング演習", required: 1, test: eq("プログラミング演習") },
+      ],
+    },
+    {
+      label: "第1外国語+学術英語", buckets: ["lang1"], required: 12,
+      named: [
+        { label: "Intensive English（10科目）", required: 10, test: re(/^Intensive English/) },
+        { label: "学術英語", required: 2, test: re(/学術英語/) },
+      ],
+    },
     { label: "第2外国語", buckets: ["lang2"], required: 4 },
-    { label: "サイバーセキュリティ科目", buckets: ["cyber"], required: 1 },
-    { label: "健康・スポーツ科目", buckets: ["health"], required: 1 },
+    {
+      label: "サイバーセキュリティ科目", buckets: ["cyber"], required: 1,
+      named: [{ label: "サイバーセキュリティ基礎論", required: 1, test: eq("サイバーセキュリティ基礎論") }],
+    },
+    {
+      label: "健康・スポーツ科目", buckets: ["health"], required: 1,
+      named: [{ label: "健康・スポーツ科学演習", required: 1, test: eq("健康・スポーツ科学演習") }],
+    },
     { label: "高年次基幹教育科目", buckets: ["advanced"], required: 2 },
   ],
   specialized: [
-    { label: "共創基礎科目", buckets: ["fundamental"], required: 7 },
-    { label: "構想科目（合計）", buckets: ["lectureSeries", "approachHS", "approachNS", "approachID", "framingOther"], required: 28 },
+    {
+      label: "共創基礎科目", buckets: ["fundamental"], required: 7,
+      named: [
+        { label: "学術研究基礎", required: 1, test: eq("学術研究基礎") },
+        { label: "課題とイノベーション", required: 1, test: eq("課題とイノベーション") },
+        { label: "共創のための数学", required: 1, test: eq("共創のための数学") },
+        { label: "システム科学基礎", required: 1, test: eq("システム科学基礎") },
+        { label: "データの収集・分析", required: 1, test: eq("データの収集・分析") },
+        { label: "世界の様々な哲学", required: 1, test: eq("世界の様々な哲学") },
+        { label: "世界を理解するための歴史的視座", required: 1, test: eq("世界を理解するための歴史的視座") },
+      ],
+    },
+    {
+      label: "構想科目（合計）", buckets: ["lectureSeries", "approachHS", "approachNS", "approachID", "framingOther"], required: 28,
+      named: [{ label: "レクチャーシリーズ", required: 2, test: eq("レクチャーシリーズ") }],
+    },
     { label: "アプローチ科目（人社）", buckets: ["approachHS"], required: 2 },
     { label: "アプローチ科目（自然）", buckets: ["approachNS"], required: 2 },
     { label: "アプローチ科目（学際）", buckets: ["approachID"], required: 2 },
-    { label: "協働科目", buckets: ["collab"], required: 8 },
-    { label: "経験科目", buckets: ["experience"], required: 2 },
-    { label: "ディグリープロジェクト", buckets: ["degreeProject"], required: 9 },
-    { label: "共創発展演習", buckets: ["advSeminar"], required: 4 },
+    {
+      label: "協働科目", buckets: ["collab"], required: 8,
+      named: [
+        { label: "共創基礎プロジェクト", required: 2, test: eq("共創基礎プロジェクト") },
+        { label: "共創プロジェクト", required: 6, test: eq("共創プロジェクト") },
+      ],
+    },
+    {
+      label: "経験科目", buckets: ["experience"], required: 2,
+      named: [
+        { label: "異文化対応1", required: 1, test: re(/^異文化対応\s*1$/) },
+        { label: "異文化対応2", required: 1, test: re(/^異文化対応\s*2$/) },
+      ],
+    },
+    {
+      label: "ディグリープロジェクト", buckets: ["degreeProject"], required: 9,
+      named: [
+        { label: "ディグリープロジェクト1", required: 2, test: re(/^ディグリープロジェクト1$/) },
+        { label: "ディグリープロジェクト2", required: 5, test: re(/^ディグリープロジェクト2$/) },
+        { label: "ディグリープロジェクト3", required: 2, test: re(/^ディグリープロジェクト3$/) },
+      ],
+    },
+    {
+      label: "共創発展演習", buckets: ["advSeminar"], required: 4,
+      named: [
+        { label: "共創発展演習1", required: 2, test: re(/^共創発展演習1$/) },
+        { label: "共創発展演習2", required: 2, test: re(/^共創発展演習2$/) },
+      ],
+    },
     { label: "課題科目", buckets: ["issue"], required: 6 },
   ],
   framingTotal: 28,
@@ -231,6 +297,7 @@ export function classifyCourse(course, cfg = DEFAULT_CONFIG, overrides = {}) {
 }
 
 const sum = (buckets, key) => (buckets.get(key) || []).reduce((s, e) => s + e.course.credits, 0);
+const sumNamed = (buckets, key, test) => (buckets.get(key) || []).reduce((s, e) => (test(e.course.name) ? s + e.course.credits : s), 0);
 const excess = (buckets, key, min) => Math.max(0, sum(buckets, key) - min);
 
 export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
@@ -257,14 +324,26 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
 
   const ok = [];
   const missing = [];
-  const check = (label, earned, required) => {
-    const item = { label, earned, required, short: Math.max(0, required - earned) };
-    (earned >= required ? ok : missing).push(item);
+  const check = (label, earned, required, namedShort = 0, named = []) => {
+    const item = { label, earned, required, short: Math.max(0, required - earned, namedShort), named };
+    ((earned >= required && namedShort === 0) ? ok : missing).push(item);
     return item;
   };
 
-  for (const r of R.kikan) check(r.label, r.buckets.reduce((s, k) => s + sum(buckets, k), 0), r.required);
-  for (const r of R.specialized) check(r.label, r.buckets.reduce((s, k) => s + sum(buckets, k), 0), r.required);
+  const checkReq = r => {
+    const earned = r.buckets.reduce((s, k) => s + sum(buckets, k), 0);
+    let namedShort = 0;
+    const named = (r.named || []).map(nm => {
+      const ne = r.buckets.reduce((s, k) => s + sumNamed(buckets, k, nm.test), 0);
+      const ns = Math.max(0, nm.required - ne);
+      namedShort += ns;
+      return { label: nm.label, earned: ne, required: nm.required, short: ns };
+    });
+    check(r.label, earned, r.required, namedShort, named);
+  };
+
+  for (const r of R.kikan) checkReq(r);
+  for (const r of R.specialized) checkReq(r);
 
   const framing = sum(buckets, "lectureSeries") + sum(buckets, "approachHS") + sum(buckets, "approachNS") + sum(buckets, "approachID") + sum(buckets, "framingOther");
 

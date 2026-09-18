@@ -110,13 +110,17 @@ function renderMissing(r) {
     $("missing").innerHTML = `<h3>不足項目</h3><p style="color:var(--ok)">すべての要件を満たしています。</p>`;
     return;
   }
-  const rows = items.map(m => `
+  const rows = items.map(m => {
+    const subs = (m.named || []).filter(x => x.short > 0)
+      .map(x => `${escapeHtml(x.label)} ${fmt(x.earned)}/${fmt(x.required)}`).join("、");
+    return `
     <tr>
-      <td>${escapeHtml(m.label)}</td>
+      <td>${escapeHtml(m.label)}${subs ? `<div class="sub">${subs}</div>` : ""}</td>
       <td class="num">${fmt(m.earned)}</td>
       <td class="num">${fmt(m.required)}</td>
       <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
   $("missing").innerHTML = `
     <h3>不足項目（${items.length}項目）</h3>
     <table>
@@ -142,13 +146,21 @@ function renderProgress(r) {
       ${reqs.map(req => {
         const m = r.ok.find(x => x.label === req.label) || r.missing.find(x => x.label === req.label);
         const pct = clamp100((m.earned / m.required) * 100);
+        const ng = m.short > 0;
+        const subs = (m.named || []).filter(x => x.short > 0).map(x => `
+        <div class="progress-sub">
+          <span class="name">${escapeHtml(x.label)}</span>
+          <span class="val">${fmt(x.earned)} / ${fmt(x.required)}</span>
+          <span class="val">不足 ${fmt(x.short)}</span>
+        </div>`).join("");
         return `
-        <div class="progress-row ${m.earned >= m.required ? "" : "ng"}">
+        <div class="progress-row ${ng ? "ng" : ""}">
           <div class="name">${escapeHtml(req.label)}</div>
           <div class="val">${fmt(m.earned)} / ${fmt(m.required)}</div>
           <div class="track"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div></div>
-          <div class="val">${m.earned >= m.required ? "OK" : "不足 " + fmt(m.short)}</div>
-        </div>`;
+          <div class="val">${ng ? "不足 " + fmt(m.short) : "OK"}</div>
+        </div>
+        ${subs}`;
       }).join("")}
     </div>`).join("");
   $("progress").innerHTML = html;
