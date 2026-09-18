@@ -119,10 +119,15 @@ function renderMissing(r) {
     </tr>`).join("");
   $("missing").innerHTML = `
     <h3>不足項目（${items.length}項目）</h3>
-    <p class="total-need">新規に取らなければいけない単位数: <b>${fmt(r.totalShort)}単位</b>（下記の区分で不足）</p>
     <table>
       <thead><tr><th>区分</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
       <tbody>${rows}</tbody>
+      <tfoot><tr class="total-row">
+        <td>新規に取らなければいけない単位数（要件別の不足単位の合計）</td>
+        <td class="num">—</td>
+        <td class="num">—</td>
+        <td class="num"><b>${fmt(r.totalShort)}単位</b></td>
+      </tr></tfoot>
     </table>`;
 }
 

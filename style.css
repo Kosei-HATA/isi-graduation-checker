@@ -115,16 +115,12 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .stat .num { font-size: 1.3rem; font-weight: 700; }
 .stat .lbl { font-size: .82rem; color: var(--muted); }
 
-.total-need {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin: 10px 0 4px;
-  padding: 10px 14px;
-  border: 1px solid #f0c4c3;
+.total-row td {
   background: var(--ng-bg);
-  border-radius: 8px;
+  font-weight: 700;
+  border-top: 2px solid var(--ng);
 }
-.total-need b { color: var(--ng); font-size: 1.4rem; }
+.total-row b { color: var(--ng); font-size: 1.2rem; }
 
 table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-top: 10px; }
 th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
