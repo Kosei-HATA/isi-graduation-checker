@@ -147,7 +147,8 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 
 .sub { font-size: .78rem; color: var(--muted); font-weight: normal; }
 
-.named-row td { padding-left: 30px; background: #fff8f0; }
+#missing h4 { margin: 14px 0 4px; font-size: .92rem; }
+
 .must-badge {
   display: inline-block;
   background: var(--warn);
