@@ -111,6 +111,8 @@ const GENRE_MAP = {
 const FACULTY_GENRE_RE = /^[(（].+[)）]専攻教育科目$/;
 const APPROACH_FIELD_RE = /^〔(人社|自然|学際)〕/;
 const APPROACH_FIELD_TO = { "人社": "HS", "自然": "NS", "学際": "ID" };
+const FRAMING_FAMILY = new Set(["lectureSeries", "approachHS", "approachNS", "approachID"]);
+const IIC_FAMILY = new Set(["degreeProject", "advSeminar", "issue"]);
 const LANG2_NAME_RE = /中国語|ロシア語|ドイツ語|フランス語|スペイン語|韓国語|アラビア語|イタリア語|ポルトガル語|ベトナム語|インドネシア語|タイ語|モンゴル語|ヒンディー語|ラテン語|ギリシャ語|トルコ語|ウクライナ語|オランダ語|スウェーデン語|ノルウェー語|デンマーク語|フィンランド語|ポーランド語|チェコ語|ハンガリー語|ルーマニア語/;
 
 function starts(s, p) {
@@ -152,7 +154,7 @@ export function resolveCode(code, cfg = DEFAULT_CONFIG) {
   if (starts(code, "KED-GES")) return "sogo";
   if (starts(code, "ISI-ISI13")) return "fundamental";
   if (starts(code, "ISI-ISI2601")) return "lectureSeries";
-  if (/^ISI-ISI260[2-9]/.test(code)) return "experience";
+  if (/^ISI-ISI260[45]/.test(code)) return "experience";
   if (starts(code, "ISI-ISI2903") || starts(code, "ISI-ISI3901")) return "collab";
   if (starts(code, "ISI-ISI46")) return "degreeProject";
   if (starts(code, "ISI-ISI49")) return "advSeminar";
@@ -205,15 +207,15 @@ export function classifyCourse(course, cfg = DEFAULT_CONFIG, overrides = {}) {
     bucket = splitApproach(course, cfg);
     evidence = bucket && APPROACH_FIELD_RE.test(course.name || "") ? "genre+name" : "genre+code";
     if (!bucket) {
-      bucket = codeBucket || "framingOther";
-      evidence = codeBucket ? "code" : "genre";
+      bucket = "framingOther";
+      evidence = "genre";
     }
   } else if (genreBucket === "framingUmbrella") {
-    bucket = codeBucket || "framingOther";
-    evidence = codeBucket ? "code" : "genre";
+    bucket = FRAMING_FAMILY.has(codeBucket) ? codeBucket : "framingOther";
+    evidence = FRAMING_FAMILY.has(codeBucket) ? "code" : "genre";
   } else if (genreBucket === "iicUmbrella") {
-    bucket = codeBucket || "iicOther";
-    evidence = codeBucket ? "code" : "genre";
+    bucket = IIC_FAMILY.has(codeBucket) ? codeBucket : "iicOther";
+    evidence = IIC_FAMILY.has(codeBucket) ? "code" : "genre";
   } else if (genreBucket) {
     bucket = genreBucket;
     evidence = "genre";
