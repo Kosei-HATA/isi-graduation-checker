@@ -342,17 +342,11 @@ dz.addEventListener("drop", ev => {
   });
 });
 
-$("runBtn").addEventListener("click", () => {
-  state.html = $("pasteArea").value;
-  onHtmlLoaded();
-});
-
 $("clearBtn").addEventListener("click", () => {
   state.html = "";
   state.courses = [];
   state.overrides = {};
   state.result = null;
-  $("pasteArea").value = "";
   $("result").hidden = true;
   $("parseError").hidden = true;
   try { localStorage.removeItem(LS_KEY); } catch { /* noop */ }

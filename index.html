@@ -18,7 +18,7 @@
     <ol class="steps">
       <li><strong>成績照会</strong>（Campusmate）ページを開く</li>
       <li><strong>Ctrl+S</strong>（Mac は <strong>Cmd+S</strong>）で「Webページ、完全」として保存</li>
-      <li>保存した <strong>.html ファイル</strong>を下の欄にドラッグ&amp;ドロップ / ファイル選択、または内容をコピー&amp;ペースト</li>
+      <li>保存した <strong>.html ファイル</strong>を下の欄にドラッグ&amp;ドロップ / ファイル選択</li>
     </ol>
     <figure>
       <img src="assets/howto-save.png" alt="成績照会ページで Ctrl+S / Cmd+S を押して保存する手順">
@@ -30,11 +30,8 @@
     <div id="dropzone" tabindex="0">
       <p class="dz-main">ここに .html ファイルをドラッグ&amp;ドロップ</p>
       <p class="dz-sub">または <button type="button" id="pickBtn">ファイルを選択</button></p>
-      <input type="file" id="fileInput" accept=".html,.htm,.txt" hidden>
-    </div>
-    <textarea id="pasteArea" rows="5" placeholder="または、保存したHTMLの内容（テキスト）をここに貼り付けて「チェックする」を押してください"></textarea>
+      <input type="file" id="fileInput" accept=".html,.htm" hidden>
     <div class="row">
-      <button type="button" id="runBtn" class="primary">チェックする</button>
       <button type="button" id="clearBtn">クリア</button>
     </div>
     <p id="parseError" class="error" hidden></p>

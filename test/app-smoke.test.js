@@ -42,8 +42,8 @@ test("app.js: DOMスタブ上で起動し、実HTMLのチェックが一連の�
   } catch {
     return t.skip();
   }
-  document.getElementById("pasteArea").value = html;
-  els.get("runBtn").dispatch("click");
+  document.getElementById("fileInput").dispatch("change", { target: { files: [{ text: async () => html }] } });
+  await new Promise(res => setTimeout(res, 10));
 
   assert.match(els.get("summary").innerHTML, /118\.5 \/ 124 単位/);
   assert.match(els.get("summary").innerHTML, /第2外国語（データから自動推定）/);
@@ -71,7 +71,7 @@ test("app.js: DOMスタブ上で起動し、実HTMLのチェックが一連の�
 
 test("app.js: 未知の区分とコードの科目は判別不能として警告表示される", async () => {
   const html = `<table>${`<tr><td colspan="10">（共創）新設区分</td></tr><tr><td>謎の科目</td><td>1</td><td>Ｓ</td><td>4.0</td><td>2025</td><td>秋学期</td><td>KED-XXX9999</td><td></td><td></td><td></td></tr>`}</table>`;
-  document.getElementById("pasteArea").value = html;
-  els.get("runBtn").dispatch("click");
+  document.getElementById("fileInput").dispatch("change", { target: { files: [{ text: async () => html }] } });
+  await new Promise(res => setTimeout(res, 10));
   assert.match(els.get("courses").innerHTML, /判別不能 1 科目/);
 });
