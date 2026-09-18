@@ -114,7 +114,7 @@ function renderMissing(r) {
     const namedMissing = (m.named || []).filter(x => x.short > 0);
     const namedRows = namedMissing.map(x => `
       <tr class="named-row">
-        <td><span class="must-badge">必須科目</span>${escapeHtml(x.label)}（${fmt(x.required)}単位）</td>
+        <td><span class="must-badge">必須科目</span>${escapeHtml(x.label)}（不足${fmt(x.short)}単位）</td>
         <td class="num"></td>
         <td class="num"></td>
         <td class="num"></td>
