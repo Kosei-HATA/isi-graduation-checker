@@ -358,6 +358,25 @@ test("分類: アプローチ科目で分野もコードも不明でも構想そ
   assert.equal(r.bucket, "framingOther");
 });
 
+test("分類: 海外活動・グローバル・オンラインも経験科目として扱われる", () => {
+  const cases = [
+    ["海外活動A", "ISI-ISI2606", "（共創）経験科目"],
+    ["海外活動B", "ISI-ISI2607", "（共創）異文化対応"],
+    ["グローバル・オンラインA", "ISI-ISI2608", "（共創）経験科目"],
+    ["グローバル・オンラインB", "ISI-ISI2609", "（共創）異文化対応"],
+    ["海外活動A", "ISI-ISI2606", "（共創）海外活動"],
+    ["グローバル・オンラインA", "ISI-ISI2608", "（共創）グローバル・オンライン"],
+    ["海外活動A", "ISI-ISI2606", ""],
+    ["グローバル・オンラインA", "ISI-ISI2608", ""],
+  ];
+  for (const [name, code, genre] of cases) {
+    const r = classifyCourse(C(0, name, 1, code, genre));
+    assert.equal(r.bucket, "experience", `${genre || "(genre無し)"} ${name}`);
+  }
+  const ls = classifyCourse(C(1, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）レクチャーシリーズ"));
+  assert.equal(ls.bucket, "lectureSeries");
+});
+
 test("評価: 構想その他も構想科目28に算入され、超過はその他（お）に", () => {
   const courses = [
     C(0, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）構想科目"),

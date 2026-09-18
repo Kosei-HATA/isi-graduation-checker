@@ -96,6 +96,8 @@ const GENRE_MAP = {
   "（共創）共創基礎プロジェクト": "collab",
   "（共創）共創プロジェクト": "collab",
   "（共創）異文化対応": "experience",
+  "（共創）海外活動": "experience",
+  "（共創）グローバル・オンライン": "experience",
   "（共創）ディグリープロジェクト": "degreeProject",
   "（共創）課題科目": "issue",
   "（共創）共創発展演習": "advSeminar",
@@ -150,7 +152,7 @@ export function resolveCode(code, cfg = DEFAULT_CONFIG) {
   if (starts(code, "KED-GES")) return "sogo";
   if (starts(code, "ISI-ISI13")) return "fundamental";
   if (starts(code, "ISI-ISI2601")) return "lectureSeries";
-  if (/^ISI-ISI260[45]/.test(code)) return "experience";
+  if (/^ISI-ISI260[2-9]/.test(code)) return "experience";
   if (starts(code, "ISI-ISI2903") || starts(code, "ISI-ISI3901")) return "collab";
   if (starts(code, "ISI-ISI46")) return "degreeProject";
   if (starts(code, "ISI-ISI49")) return "advSeminar";
