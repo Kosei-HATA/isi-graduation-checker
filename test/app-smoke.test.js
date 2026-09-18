@@ -53,9 +53,9 @@ test("app.js: DOMスタブ上で起動し、実HTMLのチェックが一連の�
   assert.match(els.get("missing").innerHTML, /新規に取らなければいけない単位数（要件別の不足単位の合計）/);
   assert.match(els.get("missing").innerHTML, /<b>11単位<\/b>/);
   assert.match(els.get("missing").innerHTML, /必須科目/);
-  assert.match(els.get("missing").innerHTML, /ディグリープロジェクト2（不足5単位）/);
-  assert.match(els.get("missing").innerHTML, /共創発展演習2（不足2単位）/);
-  assert.match(els.get("missing").innerHTML, /共創プロジェクト（不足1単位）/);
+  assert.match(els.get("missing").innerHTML, /ディグリープロジェクト2（5単位）/);
+  assert.match(els.get("missing").innerHTML, /共創発展演習2（2単位）/);
+  assert.match(els.get("missing").innerHTML, /共創プロジェクト（1単位）/);
   assert.match(els.get("progress").innerHTML, /基幹教育科目（48単位）/);
   assert.match(els.get("progress").innerHTML, /専攻教育科目（76単位）/);
   assert.match(els.get("others").innerHTML, /基幹教育科目その他/);
