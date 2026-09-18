@@ -87,6 +87,7 @@ function buildCourse(cells, genre, index) {
     credits: credits ?? 0,
     grade: grade ?? "",
     rawGrade: cells[2] ?? "",
+    gp: CREDIT_RE.test(cells[3] ?? "") ? parseFloat(cells[3]) : null,
     code: code ? code.replace(/[A-Za-z]$/, "") : "",
     rawCode: code,
     genre,

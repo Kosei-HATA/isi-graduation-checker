@@ -531,15 +531,17 @@ test("評価: レクチャーシリーズとアプローチだけで構想科目
   assert.equal(r.specOthers.breakdown.o, 0);
 });
 
-test("GPA: S=4/A=3/B=2/C=1/F=0 で加重平均、R/Wは分母・分子とも除外", () => {
+test("GPA: 評価ではなくGP列の値で計算し、GP無し（*等）は算入しない", () => {
+  const g = (index, name, credits, grade, gp) => ({ ...C(index, name, credits, "KED-KES1111", "", grade), gp });
   const courses = [
-    C(0, "S科目", 2, "KED-KES1111", "", "S"),
-    C(1, "A科目", 1, "KED-KES1111", "", "A"),
-    C(2, "B科目", 1, "KED-KES1111", "", "B"),
-    C(3, "C科目", 1, "KED-KES1111", "", "C"),
-    C(4, "F科目", 1, "KED-KES1111", "", "F"),
-    C(5, "R科目", 1, "KED-KES1111", "", "R"),
-    C(6, "W科目", 1, "KED-KES1111", "", "W"),
+    g(0, "S科目", 2, "S", 4),
+    g(1, "A科目", 1, "A", 3),
+    g(2, "B科目", 1, "B", 2),
+    g(3, "C科目", 1, "C", 1),
+    g(4, "F科目", 1, "F", 0),
+    g(5, "R科目", 1, "R", null),
+    g(6, "W科目", 1, "W", null),
+    g(7, "IUPE相当（成績SでもGP無し）", 2, "S", null),
   ];
   const r = calcGPA(courses);
   assert.equal(r.credits, 6);
@@ -552,12 +554,13 @@ test("GPA: 対象科目が無ければ0", () => {
   assert.equal(calcGPA([C(0, "R科目", 1, "KED-KES1111", "", "R")]).gpa, 0);
 });
 
-test("統合: 実HTMLのGPAが期待値と一致する（3.668・対象111.5単位）", t => {
+test("統合: 実HTMLのGPAがGP列ベースで期待値と一致する（3.662・対象109.5単位・GPT401）", t => {
   if (!REAL_HTML) return t.skip();
   const { courses } = parseGradeHTML(REAL_HTML);
   const r = calcGPA(courses);
-  assert.ok(Math.abs(r.gpa - 3.668) < 0.001, r.gpa);
-  assert.equal(r.credits, 111.5);
+  assert.ok(Math.abs(r.gpa - 401 / 109.5) < 0.0001, r.gpa);
+  assert.equal(r.credits, 109.5);
+  assert.equal(r.points, 401);
 });
 
 test("分類: 第1外国語不足は第2外国語で穴埋めできない", () => {
