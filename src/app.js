@@ -111,15 +111,22 @@ function renderMissing(r) {
     return;
   }
   const rows = items.map(m => {
-    const subs = (m.named || []).filter(x => x.short > 0)
-      .map(x => `${escapeHtml(x.label)} ${fmt(x.earned)}/${fmt(x.required)}`).join("、");
+    const namedMissing = (m.named || []).filter(x => x.short > 0);
+    const namedRows = namedMissing.map(x => `
+      <tr class="named-row">
+        <td><span class="must-badge">必須科目</span>${escapeHtml(x.label)}</td>
+        <td class="num">${fmt(x.earned)}</td>
+        <td class="num">${fmt(x.required)}</td>
+        <td class="num" style="color:var(--ng);font-weight:700">${fmt(x.short)}</td>
+      </tr>`).join("");
     return `
-    <tr>
-      <td>${escapeHtml(m.label)}${subs ? `<div class="sub">${subs}</div>` : ""}</td>
-      <td class="num">${fmt(m.earned)}</td>
-      <td class="num">${fmt(m.required)}</td>
-      <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
-    </tr>`;
+      <tr>
+        <td>${escapeHtml(m.label)}</td>
+        <td class="num">${fmt(m.earned)}</td>
+        <td class="num">${fmt(m.required)}</td>
+        <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
+      </tr>
+      ${namedRows}`;
   }).join("");
   $("missing").innerHTML = `
     <h3>不足項目（${items.length}項目）</h3>
