@@ -110,40 +110,36 @@ function renderMissing(r) {
     $("missing").innerHTML = `<h3>不足項目</h3><p style="color:var(--ok)">すべての要件を満たしています。</p>`;
     return;
   }
-  const categoryRows = items.map(m => `
-    <tr>
-      <td>${escapeHtml(m.label)}</td>
-      <td class="num">${fmt(m.earned)}</td>
-      <td class="num">${fmt(m.required)}</td>
-      <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
-    </tr>`).join("");
-  const namedItems = items.flatMap(m => (m.named || []).filter(x => x.short > 0).map(x => ({ ...x, parent: m.label })));
-  const namedRows = namedItems.map(x => `
-    <tr>
-      <td><span class="must-badge">必須科目</span>${escapeHtml(x.label)}<div class="sub">（${escapeHtml(x.parent)}）</div></td>
-      <td class="num">${fmt(x.earned)}</td>
-      <td class="num">${fmt(x.required)}</td>
-      <td class="num" style="color:var(--ng);font-weight:700">${fmt(x.short)}</td>
-    </tr>`).join("");
+  const rows = items.map(m => {
+    const namedMissing = (m.named || []).filter(x => x.short > 0);
+    const namedRows = namedMissing.map(x => `
+      <tr class="named-row">
+        <td><span class="must-badge">必須科目</span>${escapeHtml(x.label)}（${fmt(x.required)}単位）</td>
+        <td class="num"></td>
+        <td class="num"></td>
+        <td class="num"></td>
+      </tr>`).join("");
+    return `
+      <tr>
+        <td>${escapeHtml(m.label)}</td>
+        <td class="num">${fmt(m.earned)}</td>
+        <td class="num">${fmt(m.required)}</td>
+        <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
+      </tr>
+      ${namedRows}`;
+  }).join("");
   $("missing").innerHTML = `
-    <h3>不足項目（不足区分 ${items.length} / 未修得の必須科目 ${namedItems.length}）</h3>
-    <h4 class="grp">不足している区分</h4>
+    <h3>不足項目（${items.length}項目）</h3>
     <table>
       <thead><tr><th>区分</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
-      <tbody>${categoryRows}</tbody>
+      <tbody>${rows}</tbody>
       <tfoot><tr class="total-row">
         <td>新規に取らなければいけない単位数（要件別の不足単位の合計）</td>
         <td class="num">—</td>
         <td class="num">—</td>
         <td class="num"><b>${fmt(r.totalShort)}単位</b></td>
       </tr></tfoot>
-    </table>
-    ${namedItems.length ? `
-    <h4 class="grp warn">未修得の必須科目</h4>
-    <table class="named-table">
-      <thead><tr><th>科目名</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
-      <tbody>${namedRows}</tbody>
-    </table>` : ""}`;
+    </table>`;
 }
 
 function renderProgress(r) {
