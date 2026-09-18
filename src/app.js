@@ -105,11 +105,12 @@ function renderSummary(r) {
 }
 
 function renderMissing(r) {
-  if (!r.missing.length) {
+  const items = r.missing.filter(m => m.label !== "総修得単位数");
+  if (!items.length) {
     $("missing").innerHTML = `<h3>不足項目</h3><p style="color:var(--ok)">すべての要件を満たしています。</p>`;
     return;
   }
-  const rows = r.missing.map(m => `
+  const rows = items.map(m => `
     <tr>
       <td>${escapeHtml(m.label)}</td>
       <td class="num">${fmt(m.earned)}</td>
@@ -117,7 +118,7 @@ function renderMissing(r) {
       <td class="num" style="color:var(--ng);font-weight:700">${fmt(m.short)}</td>
     </tr>`).join("");
   $("missing").innerHTML = `
-    <h3>不足項目（${r.missing.length}項目）</h3>
+    <h3>不足項目（${items.length}項目）</h3>
     <table>
       <thead><tr><th>区分</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
       <tbody>${rows}</tbody>
