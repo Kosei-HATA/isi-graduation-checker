@@ -233,8 +233,7 @@ function renderCourseTable(r) {
         <th class="num">単位数</th><th>成績</th><th>科目コード</th><th>振替（手動）</th>
       </tr></thead>
       <tbody id="courseBody"></tbody>
-    </table>
-    <p style="font-size:.82rem;color:var(--muted)">※ コード無しでもジャンル見出しで分類。不一致はジャンル優先で赤表示。他学部は上限10単位まで。</p>`;
+    </table>`;
   $("courseSearch").addEventListener("input", renderCourseRows);
   $("bucketFilter").addEventListener("change", renderCourseRows);
   renderCourseRows();

@@ -509,6 +509,17 @@ test("評価: 構想科目はレクチャーシリーズが必須（構想その
   assert.deepEqual(f.named.filter(x => x.short > 0).map(x => x.label), ["レクチャーシリーズ"]);
 });
 
+test("評価: 構想28を満たしていてもアプローチ各分野2単位が無ければ不足", () => {
+  const courses = [
+    C(0, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）レクチャーシリーズ"),
+    ...Array.from({ length: 26 }, (_, i) => C(1 + i, `〔人社〕科目${i}`, 1, `ISI-ISI21${String(10 + i).padStart(2, "0")}`, "（共創）アプローチ科目")),
+  ];
+  const r = evaluate(courses);
+  assert.equal(r.missing.find(m => m.label === "構想科目（合計）"), undefined);
+  assert.equal(r.missing.find(m => m.label === "アプローチ科目（自然）").short, 2);
+  assert.equal(r.missing.find(m => m.label === "アプローチ科目（学際）").short, 2);
+});
+
 test("評価: レクチャーシリーズとアプローチだけで構想科目28を満たす", () => {
   const courses = [
     C(0, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）レクチャーシリーズ"),
