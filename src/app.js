@@ -1,5 +1,5 @@
 import { parseGradeHTML } from "./parser.js";
-import { evaluate, DEFAULT_CONFIG, BUCKET_LABELS, REQUIREMENTS_2023 } from "./core.js";
+import { evaluate, DEFAULT_CONFIG, BUCKET_LABELS, REQUIREMENTS_2023, calcGPA } from "./core.js";
 
 const LS_KEY = "isi-grad-check";
 
@@ -92,6 +92,7 @@ function renderSummary(r) {
   const allOk = r.missing.length === 0;
   const lang2 = inferSecondLanguage(r);
   const lang2Html = lang2 ? `${escapeHtml(lang2.lang)}（${fmt(lang2.credits)}単位）` : "なし";
+  const gpa = calcGPA(state.courses);
   $("summary").innerHTML = `
     <div class="row" style="align-items:center">
       <span class="badge ${allOk ? "ok" : "ng"}">${allOk ? "卒業要件を満たしています" : "不足があります"}</span>
@@ -100,6 +101,7 @@ function renderSummary(r) {
       <div class="stat"><div class="num">${fmt(r.totalCredits)} / ${r.totalRequired} 単位</div><div class="lbl">総修得単位数（卒業まであと ${fmt(Math.max(0, r.totalRequired - r.totalCredits))} 単位）</div></div>
       <div class="stat"><div class="num">${fmt(r.totalShort)} 単位</div><div class="lbl">新規に取らなければいけない単位数（要件別の不足単位の合計）</div></div>
       <div class="stat"><div class="num">${escapeHtml(lang2Html)}</div><div class="lbl">第2外国語（データから自動推定）</div></div>
+      <div class="stat"><div class="num">${gpa.gpa.toFixed(2)}</div><div class="lbl">計算GPA</div><div class="lbl">対象単位数 ${fmt(gpa.credits)} / GPT ${fmt(gpa.points)}</div></div>
     </div>`;
 }
 
