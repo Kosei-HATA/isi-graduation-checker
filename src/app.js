@@ -127,7 +127,7 @@ function renderMissing(r) {
     </tr>`).join("");
   $("missing").innerHTML = `
     <h3>不足項目（不足区分 ${items.length} / 未修得の必須科目 ${namedItems.length}）</h3>
-    <h4>不足している区分</h4>
+    <h4 class="grp">不足している区分</h4>
     <table>
       <thead><tr><th>区分</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
       <tbody>${categoryRows}</tbody>
@@ -139,8 +139,8 @@ function renderMissing(r) {
       </tr></tfoot>
     </table>
     ${namedItems.length ? `
-    <h4>未修得の必須科目</h4>
-    <table>
+    <h4 class="grp warn">未修得の必須科目</h4>
+    <table class="named-table">
       <thead><tr><th>科目名</th><th class="num">修得</th><th class="num">必要</th><th class="num">不足</th></tr></thead>
       <tbody>${namedRows}</tbody>
     </table>` : ""}`;
