@@ -116,7 +116,7 @@ test("統合: 基幹その他・専攻その他の内訳（A=0,B=6,D=13,F=7 → 
   const { courses } = parseGradeHTML(REAL_HTML);
   const r = evaluate(courses);
   assert.deepEqual(r.kikanOthers.breakdown, { A: 0, B: 6, C: 0, D: 13, E: 0, F: 7, dIntoKikan: 2.5, specPortion: 17.5 });
-  assert.deepEqual(r.specOthers.breakdown, { o: 0, ka: 0, ki: 0, ku: 0, othersSpec: 0, fromFlexible: 17.5 });
+  assert.deepEqual(r.specOthers.breakdown, { o: 0, ka: 0, ki: 0, ku: 0, iic: 0, othersSpec: 0, fromFlexible: 17.5 });
 });
 
 test("統合: 全ての科目がジャンル見出しで分類されている", t => {
@@ -343,6 +343,81 @@ test("評価: 手動バケット（その他（基幹）/その他（専攻）�
   assert.equal(r.kikanOthers.earned, 3);
   assert.equal(r.specOthers.breakdown.othersSpec, 2);
   assert.equal(r.totalCredits, 5);
+});
+
+test("分類: 構想科目の区分でコード不明な科目は構想その他として計上", () => {
+  const r = classifyCourse(C(0, "共創基礎演習", 2, "KED-XXX9999", "（共創）構想科目"));
+  assert.equal(r.bucket, "framingOther");
+  assert.equal(r.evidence, "genre");
+  const withKnownCode = classifyCourse(C(1, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）構想科目"));
+  assert.equal(withKnownCode.bucket, "lectureSeries");
+});
+
+test("分類: アプローチ科目で分野もコードも不明でも構想その他として計上", () => {
+  const r = classifyCourse(C(0, "演習科目", 2, "", "（共創）アプローチ科目"));
+  assert.equal(r.bucket, "framingOther");
+});
+
+test("評価: 構想その他も構想科目28に算入され、超過はその他（お）に", () => {
+  const courses = [
+    C(0, "レクチャーシリーズ", 2, "ISI-ISI2601", "（共創）構想科目"),
+    C(1, "共創基礎演習", 2, "KED-XXX9999", "（共創）構想科目"),
+    ...Array.from({ length: 24 }, (_, i) => C(2 + i, `〔人社〕科目${i}`, 1, `ISI-ISI21${String(10 + i).padStart(2, "0")}`, "（共創）アプローチ科目")),
+  ];
+  const r = evaluate(courses);
+  assert.equal(r.missing.find(m => m.label === "構想科目（合計）"), undefined);
+  assert.equal(r.buckets.framingOther, 2);
+  assert.equal(r.specOthers.breakdown.o, 0);
+
+  const over = evaluate([...courses, C(30, "構想その他超過", 2, "KED-XXX9998", "（共創）構想科目")]);
+  assert.equal(over.specOthers.breakdown.o, 2);
+});
+
+test("分類: 傘ジャンル直下でコード不明でも協働・経験・共創科目として計上", () => {
+  assert.equal(classifyCourse(C(0, "協働系科目", 2, "KED-XXX9999", "（共創）協働科目")).bucket, "collab");
+  assert.equal(classifyCourse(C(1, "経験系科目", 2, "KED-XXX9998", "（共創）経験科目")).bucket, "experience");
+  const iic = classifyCourse(C(2, "共創系科目", 2, "KED-XXX9997", "（共創）共創科目"));
+  assert.equal(iic.bucket, "iicOther");
+  const iicCode = classifyCourse(C(3, "ディグリープロジェクト１", 2, "ISI-ISI4601", "（共創）共創科目"));
+  assert.equal(iicCode.bucket, "degreeProject");
+});
+
+test("分類: 言語文化科目で非LCBコードでも科目名で判定され、nullにならない", () => {
+  assert.equal(classifyCourse(C(0, "Intensive English: Global Issues RW1", 1, "KED-XXX9999", "言語文化科目")).bucket, "lang1");
+  assert.equal(classifyCourse(C(1, "中国語ⅠA", 1, "KED-XXX9998", "言語文化基礎科目")).bucket, "lang2");
+  const r = evaluate([C(2, "言語系科目", 2, "KED-XXX9997", "言語文化基礎科目")]);
+  assert.equal(r.unknownCourses.length, 0);
+  assert.equal(r.buckets.lang2, 2);
+});
+
+test("評価: その他（く）は共創科目（DP+演習+課題）の19単位超過で計算される", () => {
+  const courses = [
+    ...Array.from({ length: 9 }, (_, i) => C(i, `DP${i}`, 1, `ISI-ISI46${String(10 + i).padStart(2, "0")}`, "（共創）ディグリープロジェクト")),
+    ...Array.from({ length: 4 }, (_, i) => C(9 + i, `演習${i}`, 1, `ISI-ISI49${String(10 + i).padStart(2, "0")}`, "（共創）共創発展演習")),
+    ...Array.from({ length: 9 }, (_, i) => C(13 + i, `課題${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目")),
+  ];
+  const r = evaluate(courses);
+  assert.equal(r.missing.find(m => m.label === "ディグリープロジェクト"), undefined);
+  assert.equal(r.specOthers.breakdown.ku, 3);
+});
+
+test("評価: 共創科目（その他）が専攻その他に算入される", () => {
+  const courses = [
+    C(0, "共創系科目", 2, "KED-XXX9999", "（共創）共創科目"),
+    C(1, "構想系科目", 2, "KED-XXX9998", "（共創）構想科目"),
+  ];
+  const r = evaluate(courses);
+  assert.equal(r.buckets.iicOther, 2);
+  assert.equal(r.buckets.framingOther, 2);
+  assert.equal(r.specOthers.breakdown.iic, 2);
+  assert.equal(r.missing.find(m => m.label === "構想科目（合計）").short, 26);
+});
+
+test("評価: 構想科目が構想その他だけで満たせる", () => {
+  const courses = Array.from({ length: 28 }, (_, i) => C(i, `共創基礎演習${i}`, 1, "KED-XXX9999", "（共創）構想科目"));
+  const r = evaluate(courses);
+  assert.equal(r.missing.find(m => m.label === "構想科目（合計）"), undefined);
+  assert.equal(r.buckets.framingOther, 28);
 });
 
 test("評価: レクチャーシリーズとアプローチだけで構想科目28を満たす", () => {

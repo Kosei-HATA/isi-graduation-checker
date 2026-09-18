@@ -183,7 +183,8 @@ function renderOthers(r) {
           <tr><td>お（構想科目の超過）</td><td class="num">${fmt(sb.o)}</td></tr>
           <tr><td>か（協働科目の超過 = 上限2単位）</td><td class="num">${fmt(sb.ka)}</td></tr>
           <tr><td>き（経験科目の超過）</td><td class="num">${fmt(sb.ki)}</td></tr>
-          <tr><td>く（課題科目の超過）</td><td class="num">${fmt(sb.ku)}</td></tr>
+          <tr><td>く（共創科目 = ディグリープロジェクト+演習+課題 の超過）</td><td class="num">${fmt(sb.ku)}</td></tr>
+          <tr><td>共創科目（その他）</td><td class="num">${fmt(sb.iic)}</td></tr>
           <tr><td>手動振替（その他・専攻）</td><td class="num">${fmt(sb.othersSpec)}</td></tr>
           <tr><td>D/E/F からの充当</td><td class="num">${fmt(sb.fromFlexible)}</td></tr>
         </table>

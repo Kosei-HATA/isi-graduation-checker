@@ -22,7 +22,7 @@ export const REQUIREMENTS_2023 = {
   ],
   specialized: [
     { label: "共創基礎科目", buckets: ["fundamental"], required: 7 },
-    { label: "構想科目（合計）", buckets: ["lectureSeries", "approachHS", "approachNS", "approachID"], required: 28 },
+    { label: "構想科目（合計）", buckets: ["lectureSeries", "approachHS", "approachNS", "approachID", "framingOther"], required: 28 },
     { label: "アプローチ科目（人社）", buckets: ["approachHS"], required: 2 },
     { label: "アプローチ科目（自然）", buckets: ["approachNS"], required: 2 },
     { label: "アプローチ科目（学際）", buckets: ["approachID"], required: 2 },
@@ -52,6 +52,7 @@ export const BUCKET_LABELS = {
   sogo: "総合科目（ﾌﾛﾝﾃｨｱ/ｵｰﾌﾟﾝ含む）",
   fundamental: "共創基礎科目",
   lectureSeries: "レクチャーシリーズ",
+  framingOther: "構想科目（その他）",
   approachHS: "アプローチ（人社）",
   approachNS: "アプローチ（自然）",
   approachID: "アプローチ（学際）",
@@ -60,6 +61,7 @@ export const BUCKET_LABELS = {
   degreeProject: "ディグリープロジェクト",
   advSeminar: "共創発展演習",
   issue: "課題科目",
+  iicOther: "共創科目（その他）",
   otherDept: "他学部科目",
   othersKikan: "その他（基幹）手動",
   othersSpec: "その他（専攻）手動",
@@ -98,10 +100,10 @@ const GENRE_MAP = {
   "（共創）課題科目": "issue",
   "（共創）共創発展演習": "advSeminar",
   "（共創）共創基礎科目": "fundamental",
-  "（共創）構想科目": null,
-  "（共創）協働科目": null,
-  "（共創）経験科目": null,
-  "（共創）共創科目": null,
+  "（共創）構想科目": "framingUmbrella",
+  "（共創）協働科目": "collab",
+  "（共創）経験科目": "experience",
+  "（共創）共創科目": "iicUmbrella",
 };
 
 const FACULTY_GENRE_RE = /^[(（].+[)）]専攻教育科目$/;
@@ -161,15 +163,18 @@ export function resolveCode(code, cfg = DEFAULT_CONFIG) {
 }
 
 function splitLanguage(course, cfg) {
+  const n = course.name || "";
+  const byName = /english|intensive english|academic english|学術英語/i.test(n)
+    ? "lang1"
+    : LANG2_NAME_RE.test(n)
+      ? "lang2"
+      : null;
   if (course.code) {
     if (cfg.lang1Prefixes.some(p => starts(course.code, p))) return "lang1";
     if (starts(course.code, "KED-LCB")) return "lang2";
-    return null;
+    return byName || "lang2";
   }
-  const n = course.name || "";
-  if (/english|intensive english|academic english|学術英語/i.test(n)) return "lang1";
-  if (LANG2_NAME_RE.test(n)) return "lang2";
-  return "lang2";
+  return byName || "lang2";
 }
 
 function splitApproach(course, cfg) {
@@ -198,9 +203,15 @@ export function classifyCourse(course, cfg = DEFAULT_CONFIG, overrides = {}) {
     bucket = splitApproach(course, cfg);
     evidence = bucket && APPROACH_FIELD_RE.test(course.name || "") ? "genre+name" : "genre+code";
     if (!bucket) {
-      bucket = codeBucket;
-      evidence = "code";
+      bucket = codeBucket || "framingOther";
+      evidence = codeBucket ? "code" : "genre";
     }
+  } else if (genreBucket === "framingUmbrella") {
+    bucket = codeBucket || "framingOther";
+    evidence = codeBucket ? "code" : "genre";
+  } else if (genreBucket === "iicUmbrella") {
+    bucket = codeBucket || "iicOther";
+    evidence = codeBucket ? "code" : "genre";
   } else if (genreBucket) {
     bucket = genreBucket;
     evidence = "genre";
@@ -251,7 +262,7 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
   for (const r of R.kikan) check(r.label, r.buckets.reduce((s, k) => s + sum(buckets, k), 0), r.required);
   for (const r of R.specialized) check(r.label, r.buckets.reduce((s, k) => s + sum(buckets, k), 0), r.required);
 
-  const framing = sum(buckets, "lectureSeries") + sum(buckets, "approachHS") + sum(buckets, "approachNS") + sum(buckets, "approachID");
+  const framing = sum(buckets, "lectureSeries") + sum(buckets, "approachHS") + sum(buckets, "approachNS") + sum(buckets, "approachID") + sum(buckets, "framingOther");
 
   const A = excess(buckets, "seminar", 1) + excess(buckets, "icl", 2.5) + excess(buckets, "humanities", 8) + excess(buckets, "science", 8);
   const B = excess(buckets, "lang1", 12) + excess(buckets, "lang2", 4);
@@ -267,8 +278,9 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
   const o = Math.max(0, framing - R.framingTotal);
   const ka = Math.min(Math.max(0, sum(buckets, "collab") - 8), 2);
   const ki = Math.max(0, sum(buckets, "experience") - 2);
-  const ku = Math.max(0, sum(buckets, "issue") - 6);
-  const specFixed = o + ka + ki + ku + sum(buckets, "othersSpec");
+  const ku = Math.max(0, (sum(buckets, "degreeProject") + sum(buckets, "advSeminar") + sum(buckets, "issue")) - 19);
+  const iic = sum(buckets, "iicOther");
+  const specFixed = o + ka + ki + ku + iic + sum(buckets, "othersSpec");
   const specOthers = specFixed + (flexible - dIntoKikan);
 
   check("基幹教育科目その他", kikanOthers, R.kikanOthersMin);
@@ -298,7 +310,7 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
     specOthers: {
       earned: specOthers,
       required: R.specOthersMin,
-      breakdown: { o, ka, ki, ku, othersSpec: sum(buckets, "othersSpec"), fromFlexible: flexible - dIntoKikan },
+      breakdown: { o, ka, ki, ku, iic, othersSpec: sum(buckets, "othersSpec"), fromFlexible: flexible - dIntoKikan },
     },
     buckets: Object.fromEntries([...buckets].map(([k, v]) => [k, sum(buckets, k)])),
     courses: [...buckets].flatMap(([, v]) => v).map(e => {
