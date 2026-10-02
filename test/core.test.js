@@ -588,6 +588,102 @@ test("統合: 実HTMLのGPAがGP列ベースで期待値と一致する（3.662�
   assert.equal(r.points, 401);
 });
 
+test("分類: 自学部の（共創）専攻教育科目は他学部扱いにしない", () => {
+  const withCode = classifyCourse(C(0, "ディグリープロジェクト1", 2, "ISI-ISI4601", "（共創）専攻教育科目"));
+  assert.equal(withCode.bucket, "degreeProject");
+  const noCode = classifyCourse(C(1, "共創系科目", 2, "", "（共創）専攻教育科目"));
+  assert.equal(noCode.bucket, "unknown");
+});
+
+test("分類: 言語科目はコード体系が変わっても科目名で第1/第2外国語を判定", () => {
+  assert.equal(classifyCourse(C(0, "Intensive English: New Course", 1, "KED-LCB1281", "言語文化基礎科目")).bucket, "lang1");
+  assert.equal(classifyCourse(C(0, "学術英語（新）", 1, "KED-LCX1001", "言語文化基礎科目")).bucket, "lang1");
+  assert.equal(classifyCourse(C(0, "中国語上級", 1, "KED-LCX2001", "言語文化基礎科目")).bucket, "lang2");
+  assert.equal(classifyCourse(C(0, "言語科目X", 1, "KED-LCB1181", "言語文化基礎科目")).bucket, "lang1");
+  assert.equal(classifyCourse(C(0, "言語科目Y", 1, "KED-LCB1413", "言語文化基礎科目")).bucket, "lang2");
+});
+
+test("不変条件: その他内訳・総修得がバケット集計と整合し、科目追加で不足が増えない（fuzz）", () => {
+  let seed = 12345;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const pick = arr => arr[Math.floor(rnd() * arr.length)];
+  const templates = [
+    { name: "基幹教育セミナー", code: "KED-KES1111", genre: "基幹教育セミナー" },
+    { name: "課題協学科目", code: "KED-ICL1131", genre: "課題協学科目" },
+    { name: "文系科目", code: "KED-HSS1121", genre: "文系ディシプリン科目" },
+    { name: "情報科学", code: "KED-SIS1112", genre: "理系ディシプリン科目" },
+    { name: "理科", code: "KED-SBI1011", genre: "理系ディシプリン科目" },
+    { name: "Intensive English: X", code: "KED-LCB1181", genre: "言語文化基礎科目" },
+    { name: "学術英語・テーマベース", code: "KED-LCB2113", genre: "言語文化基礎科目" },
+    { name: "中国語ⅠA", code: "KED-LCB1413", genre: "言語文化基礎科目" },
+    { name: "ロシア語ⅠA", code: "KED-LCB1513", genre: "言語文化基礎科目" },
+    { name: "サイバーセキュリティ基礎論", code: "KED-CSC1111", genre: "サイバーセキュリティ科目" },
+    { name: "健康・スポーツ科学演習", code: "KED-HSP1211", genre: "健康・スポーツ科目" },
+    { name: "科学の歴史A", code: "KED-ASC2151", genre: "高年次基幹教育科目" },
+    { name: "総合", code: "KED-GES1201", genre: "総合科目" },
+    { name: "学術研究基礎", code: "ISI-ISI1301", genre: "（共創）共創基礎科目" },
+    { name: "レクチャーシリーズ", code: "ISI-ISI2601", genre: "（共創）レクチャーシリーズ" },
+    { name: "〔人社〕A", code: "ISI-ISI2103", genre: "（共創）アプローチ科目" },
+    { name: "〔自然〕A", code: "ISI-ISI2208", genre: "（共創）アプローチ科目" },
+    { name: "〔学際〕A", code: "ISI-ISI2302", genre: "（共創）アプローチ科目" },
+    { name: "共創基礎プロジェクト", code: "ISI-ISI2903", genre: "（共創）共創基礎プロジェクト" },
+    { name: "共創プロジェクト", code: "ISI-ISI3901", genre: "（共創）共創プロジェクト" },
+    { name: "異文化対応 1", code: "ISI-ISI2604", genre: "（共創）異文化対応" },
+    { name: "異文化対応 2", code: "ISI-ISI2605", genre: "（共創）異文化対応" },
+    { name: "ディグリープロジェクト1", code: "ISI-ISI4601", genre: "（共創）ディグリープロジェクト" },
+    { name: "共創発展演習1", code: "ISI-ISI4901", genre: "（共創）共創発展演習" },
+    { name: "課題研究X", code: "ISI-ISI3631", genre: "（共創）課題科目" },
+    { name: "農学部科目", code: "AGR-AGR1001", genre: "（農）専攻教育科目" },
+  ];
+  const excess = (v, min) => Math.max(0, v - min);
+  for (let iter = 0; iter < 200; iter++) {
+    const n = Math.floor(rnd() * 60);
+    const courses = [];
+    for (let i = 0; i < n; i++) {
+      const t = pick(templates);
+      courses.push({ index: i, name: t.name, credits: pick([1, 1, 1, 2, 2.5, 5]), code: t.code, genre: t.genre, grade: "S" });
+    }
+    const r = evaluate(courses);
+    const g = k => r.buckets[k] || 0;
+    const A = excess(g("seminar"), 1) + excess(g("icl"), 2.5) + excess(g("humanities"), 8) + excess(g("science"), 8);
+    const B = excess(g("lang1"), 12) + excess(g("lang2"), 4);
+    const C = excess(g("cyber"), 1) + excess(g("health"), 1);
+    const D = g("sogo");
+    const E = excess(g("advanced"), 2);
+    const F = Math.min(g("otherDept"), 10);
+    const flexible = D + E + F;
+    const kikanFixed = A + B + C;
+    const dIntoKikan = Math.min(flexible, Math.max(0, 8.5 - kikanFixed));
+    const o = Math.max(0, g("lectureSeries") + g("approachHS") + g("approachNS") + g("approachID") + g("framingOther") - 28);
+    const ka = Math.min(excess(g("collab"), 8), 2);
+    const ki = excess(g("experience"), 2);
+    const ku = excess(g("issue"), 6);
+    assert.equal(r.kikanOthers.breakdown.A, A, `iter${iter} A`);
+    assert.equal(r.kikanOthers.breakdown.B, B, `iter${iter} B`);
+    assert.equal(r.kikanOthers.breakdown.C, C, `iter${iter} C`);
+    assert.equal(r.kikanOthers.breakdown.D, D, `iter${iter} D`);
+    assert.equal(r.kikanOthers.breakdown.E, E, `iter${iter} E`);
+    assert.equal(r.kikanOthers.breakdown.F, F, `iter${iter} F`);
+    assert.equal(r.kikanOthers.breakdown.dIntoKikan, dIntoKikan, `iter${iter} alloc`);
+    assert.equal(r.specOthers.breakdown.o, o, `iter${iter} o`);
+    assert.equal(r.specOthers.breakdown.ka, ka, `iter${iter} ka`);
+    assert.equal(r.specOthers.breakdown.ki, ki, `iter${iter} ki`);
+    assert.equal(r.specOthers.breakdown.ku, ku, `iter${iter} ku`);
+    let total = 0;
+    for (const [k, v] of Object.entries(r.buckets)) {
+      if (k === "unknown") continue;
+      if (k === "otherDept") { total += Math.min(v, 10); continue; }
+      if (k === "collab") { total += Math.min(v, 10); continue; }
+      total += v;
+    }
+    assert.equal(r.totalCredits, total, `iter${iter} total`);
+    assert.ok(Number.isFinite(r.totalShort), `iter${iter} finite`);
+    const t = pick(templates);
+    const r2 = evaluate([...courses, { index: n, name: t.name, credits: 2, code: t.code, genre: t.genre, grade: "S" }]);
+    assert.ok(r2.totalShort <= r.totalShort + 1e-9, `iter${iter} monotonic ${r.totalShort} -> ${r2.totalShort}`);
+  }
+});
+
 test("分類: 第1外国語不足は第2外国語で穴埋めできない", () => {
   const courses = [
     ...Array.from({ length: 16 }, (_, i) => C(i, `中国語${i}`, 1, `KED-LCB141${i}`, "言語文化基礎科目")),

@@ -204,6 +204,14 @@ test("合成: 科目行が0件ならエラーメッセージを返す", () => {
   assert.ok(r3.error);
 });
 
+test("合成: 成績欄が欠損した行でGPA欄の*を成績と誤認しない", () => {
+  const html = `<table><tr><td>科目A</td><td>1</td><td></td><td>*</td><td>2025</td><td>前</td><td>KED-KES1111J</td></tr></table>`;
+  const { courses } = parseGradeHTML(html);
+  assert.equal(courses.length, 1);
+  assert.equal(courses[0].grade, "");
+  assert.equal(courses[0].gp, null);
+});
+
 test("合成: 見出しにしか存在しない未知のジャンルでも科目がパースされる", () => {
   const courses = makeCourses([
     "（共創）新設科目",

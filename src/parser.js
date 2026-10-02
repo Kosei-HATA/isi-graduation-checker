@@ -75,7 +75,10 @@ function buildCourse(cells, genre, index) {
     }
   }
   if (!grade) {
-    for (const v of cells.slice(1)) { const g = normalizeGrade(v); if (g) { grade = g; break; } }
+    for (const v of cells.slice(1)) {
+      const g = normalizeGrade(v);
+      if (g && g !== "*") { grade = g; break; }
+    }
   }
   if (!code) {
     for (const v of cells) if (CODE_RE.test(v)) { code = v.toUpperCase(); break; }

@@ -310,6 +310,7 @@ $("fileInput").addEventListener("change", ev => {
   const file = ev.target.files[0];
   if (!file) return;
   file.text().then(text => {
+    if (state.html !== text) state.overrides = {};
     state.html = text;
     onHtmlLoaded();
   });
@@ -337,6 +338,7 @@ dz.addEventListener("drop", ev => {
   const file = ev.dataTransfer.files[0];
   if (!file) return;
   file.text().then(text => {
+    if (state.html !== text) state.overrides = {};
     state.html = text;
     onHtmlLoaded();
   });

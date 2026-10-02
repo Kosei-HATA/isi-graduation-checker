@@ -145,8 +145,6 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 }
 .progress-sub .val { text-align: right; }
 
-.sub { font-size: .78rem; color: var(--muted); font-weight: normal; }
-
 .named-row td { padding-left: 30px; background: #fff8f0; }
 
 .must-badge {

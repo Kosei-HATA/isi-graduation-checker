@@ -148,15 +148,6 @@ export const BUCKET_LABELS = {
   excluded: "除外（F/W等）",
 };
 
-export const EVIDENCE_LABELS = {
-  genre: "ジャンル見出し",
-  "genre+code": "ジャンル+コード",
-  "genre+name": "ジャンル+科目名",
-  code: "科目コード",
-  override: "手動変更",
-  unknown: "未判定",
-};
-
 const GENRE_MAP = {
   "基幹教育セミナー": "seminar",
   "課題協学科目": "icl",
@@ -187,7 +178,7 @@ const GENRE_MAP = {
   "（共創）共創科目": "iicUmbrella",
 };
 
-const FACULTY_GENRE_RE = /^[(（].+[)）]専攻教育科目$/;
+const FACULTY_GENRE_RE = /^[(（](?!共創)[^)）]+[)）]専攻教育科目$/;
 const APPROACH_FIELD_RE = /^〔(人社|自然|学際)〕/;
 const APPROACH_FIELD_TO = { "人社": "HS", "自然": "NS", "学際": "ID" };
 const FRAMING_FAMILY = new Set(["lectureSeries", "approachHS", "approachNS", "approachID"]);
@@ -247,17 +238,13 @@ export function resolveCode(code, cfg = DEFAULT_CONFIG) {
 
 function splitLanguage(course, cfg) {
   const n = course.name || "";
-  const byName = /english|intensive english|academic english|学術英語/i.test(n)
-    ? "lang1"
-    : LANG2_NAME_RE.test(n)
-      ? "lang2"
-      : null;
+  if (/english|intensive english|academic english|学術英語/i.test(n)) return "lang1";
+  if (LANG2_NAME_RE.test(n)) return "lang2";
   if (course.code) {
     if (cfg.lang1Prefixes.some(p => starts(course.code, p))) return "lang1";
     if (starts(course.code, "KED-LCB")) return "lang2";
-    return byName || "lang2";
   }
-  return byName || "lang2";
+  return "lang2";
 }
 
 function splitApproach(course, cfg) {
@@ -390,7 +377,7 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
     if (b === "collab") { totalCredits += collabCapped; continue; }
     totalCredits += sum(buckets, b);
   }
-  const totalItem = check("総修得単位数", totalCredits, R.totalRequired);
+  check("総修得単位数", totalCredits, R.totalRequired);
 
   return {
     ok,
