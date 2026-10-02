@@ -374,7 +374,7 @@ export function evaluate(courses, cfg = DEFAULT_CONFIG, overrides = {}) {
   const o = Math.max(0, framing - R.framingTotal);
   const ka = Math.min(Math.max(0, sum(buckets, "collab") - 8), 2);
   const ki = Math.max(0, sum(buckets, "experience") - 2);
-  const ku = Math.max(0, (sum(buckets, "degreeProject") + sum(buckets, "advSeminar") + sum(buckets, "issue")) - 19);
+  const ku = Math.max(0, sum(buckets, "issue") - 6);
   const iic = sum(buckets, "iicOther");
   const specFixed = o + ka + ki + ku + iic + sum(buckets, "othersSpec");
   const specOthers = specFixed + (flexible - dIntoKikan);

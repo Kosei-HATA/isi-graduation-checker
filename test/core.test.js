@@ -430,7 +430,7 @@ test("分類: 言語文化科目で非LCBコードでも科目名で判定され
   assert.equal(r.buckets.lang2, 2);
 });
 
-test("評価: その他（く）は共創科目（DP+演習+課題）の19単位超過で計算される", () => {
+test("評価: その他（く）は課題科目の必修6を超えた分で計算される", () => {
   const courses = [
     C(0, "ディグリープロジェクト1", 2, "ISI-ISI4601", "（共創）ディグリープロジェクト"),
     C(1, "ディグリープロジェクト2", 5, "ISI-ISI4602", "（共創）ディグリープロジェクト"),
@@ -442,6 +442,31 @@ test("評価: その他（く）は共創科目（DP+演習+課題）の19単位
   const r = evaluate(courses);
   assert.equal(r.missing.find(m => m.label === "ディグリープロジェクト"), undefined);
   assert.equal(r.specOthers.breakdown.ku, 3);
+});
+
+test("回帰: 課題科目の超過はDP・演習が未充足でもその他（く）に反映される", () => {
+  const courses = Array.from({ length: 9 }, (_, i) => C(i, `課題研究${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目"));
+  const r = evaluate(courses);
+  assert.equal(r.buckets.issue, 9);
+  assert.equal(r.specOthers.breakdown.ku, 3);
+});
+
+test("回帰: 各その他バケツは自分の区分の必修を基準にする（兄弟区分の未充足に影響されない）", () => {
+  const issue = Array.from({ length: 7 }, (_, i) => C(i, `課題研究${i}`, 1, `ISI-ISI363${i + 1}`, "（共創）課題科目"));
+  assert.equal(evaluate(issue).specOthers.breakdown.ku, 1);
+
+  const collab = [
+    C(0, "共創基礎プロジェクト", 2, "ISI-ISI2903", "（共創）共創基礎プロジェクト"),
+    ...Array.from({ length: 10 }, (_, i) => C(1 + i, "共創プロジェクト", 1, "ISI-ISI3901", "（共創）共創プロジェクト")),
+  ];
+  assert.equal(evaluate(collab).specOthers.breakdown.ka, 2);
+
+  const exp = [
+    C(0, "異文化対応 1", 1, "ISI-ISI2604", "（共創）異文化対応"),
+    C(1, "異文化対応 2", 1, "ISI-ISI2605", "（共創）異文化対応"),
+    C(2, "異文化対応 3", 1, "ISI-ISI2606", "（共創）異文化対応"),
+  ];
+  assert.equal(evaluate(exp).specOthers.breakdown.ki, 1);
 });
 
 test("評価: 科目名指定の必修が未修得なら単位数が足りても不足と判定（DP1だけ9単位）", () => {
